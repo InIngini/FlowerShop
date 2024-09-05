@@ -25,7 +25,7 @@
                 <!-- Список готовых букетов -->
                 <div id="preset-bouquets" class="order-form-input" style="display:none;">
                     <label for="preset-bouquet">Список готовых букетов:</label>
-                    <select id="preset-bouquet">
+                    <select id="preset-bouquet" onchange="countMoneyBouquet()">
                     </select>
                 </div>
                 <!-- Составление букета -->
@@ -37,124 +37,36 @@
                 <!-- Не важно -->
                 <div id="budget" class="order-form-input" style="display:none;">
                     <label for="amount">На какую сумму?</label>
-                    <input type="text" placeholder="Сумма" id="amount">
+                    <input type="text" placeholder="Сумма" id="amount" oninput="updateAmount()">
                     <div id="price">$</div>
                 </div>
                 <!-- Ввод данных покупателя -->
                 <div class="order-form-input">
-                    <input type="text" placeholder="Ваша фамилия" id="last-name">
+                    <input type="text" placeholder="Ваша фамилия" oninput="updateLastName()" id="last-name">
                 </div>
                 <div class="order-form-input">
-                    <input type="text" placeholder="Ваше имя" id="name">
+                    <input type="text" placeholder="Ваше имя" oninput="updateName()" id="name">
                 </div>
                 <div class="order-form-input">
-                    <input type="text" placeholder="Ваш телефон" id="phone">
+                    <input type="text" placeholder="Ваш телефон" id="phone" maxlength="18" oninput="maskPhone(this)">
                 </div>
                 <div class="order-form-input">
                     <input type="text" placeholder="Ваш адрес" id="address">
                 </div>
+                <div class="order-form-input">
+                    <label for="payment-type">Выберите тип оплаты:</label><br>
+                    <select id="payment-type">
+                        <option value="--">--</option>
+                        <option value="наличка-курьеру">Наличкой курьеру</option>
+                        <option value="карта-сейчас">Картой сейчас</option>
+                        <option value="карта-курьеру">Картой курьеру</option>
+                    </select>
+                </div>
+                <label id="money-text" data-base-price="0">0 $</label>
                 <button class="button" id="order-action">Оформить заказ</button>
             </div>
         </div>
     </div>
 </section>
 
-<script>
-    document.getElementById("change-money").onclick = function (e) {
-        // Запоминаем, какая валюта сейчас
-        let currentCurrency = e.target.innerText;
-        let newCurrency = "$";
-
-        // Определяем, какую валюту устанавливаем
-        if (currentCurrency === "$") {
-            newCurrency = "₽";
-        } else if (currentCurrency === "₽") {
-            newCurrency = "BYN";
-        } else if (currentCurrency === 'BYN') {
-            newCurrency = '€';
-        } else if (currentCurrency === '€') {
-            newCurrency = '¥';
-        }
-
-        // Обновляем текст на кнопке
-        e.target.innerText = newCurrency;
-
-        // Получаем элемент с ценой
-        let priceElement = document.getElementById("price");
-
-        // Обновляем элемент с ценой
-        priceElement.innerText = newCurrency; // Объединяем валюту и цену
-    }
-
-
-    // Функция для отображения элементов в зависимости от выбранного букета
-    function showInputs() {
-        const bouquetType = document.getElementById("bouquet-type").value;
-        document.getElementById("preset-bouquets").style.display = "none";
-        document.getElementById("custom-bouquet").style.display = "none";
-        document.getElementById("budget").style.display = "none";
-
-        if (bouquetType === "готовый") {
-            const presetBouquets = ["Букет 1", "Букет 2", "Букет 3"];
-            const presetSelect = document.getElementById("preset-bouquet");
-            presetSelect.innerHTML = ""; // Очищаем существующие варианты
-            presetBouquets.forEach(bouquet => {
-                const option = document.createElement("option");
-                option.value = bouquet;
-                option.textContent = bouquet;
-                presetSelect.appendChild(option);
-            });
-            document.getElementById("preset-bouquets").style.display = "block";
-        } else if (bouquetType === "составить") {
-            document.getElementById("custom-bouquet").style.display = "block";
-            addFlowerInput(); // Автоматически добавляем первый селект с цветом и количеством
-        } else if (bouquetType === "неважно") {
-            document.getElementById("budget").style.display = "block";
-        }
-    }
-    let divsFlowers=[];
-    // Функция для добавления нового селекта с цветами и полем количества
-    function addFlowerInput() {
-        const flowers = ["Роза", "Астра", "Тюльпан"];
-        const container = document.getElementById("flower-container");
-        const flowerDiv = document.createElement("div");
-        flowerDiv.className = "flower-input";
-
-        // Создаём селект для выбора цвета
-        const flowerSelect = document.createElement("select");
-        flowers.forEach(flower => {
-            const option = document.createElement("option");
-            option.value = flower;
-            option.textContent = flower;
-            flowerSelect.appendChild(option);
-        });
-
-        // Создаём поле для ввода количества
-        const quantityInput = document.createElement("input");
-        quantityInput.type = "number";
-        quantityInput.min = "1";
-        quantityInput.placeholder = "Количество";
-
-        // Создаем кнопку для удаления этого селекта
-        const removeButton = document.createElement("button");
-        removeButton.textContent = "Удалить";
-        removeButton.onclick = function () {
-            container.removeChild(flowerDiv);
-            // Удаляем из массива divsFlowers
-            divsFlowers = divsFlowers.filter(div => div !== flowerDiv);
-        };
-
-        // Добавляем селект, поле ввода и кнопку удаления в контейнер
-        flowerDiv.appendChild(flowerSelect);
-        flowerDiv.appendChild(quantityInput);
-        flowerDiv.appendChild(removeButton);
-        container.appendChild(flowerDiv);
-
-        // Добавляем созданный div в массив divsFlowers
-        divsFlowers.push(flowerDiv);
-    }
-
-    // Добавляем глобальную функцию для добавления новых цветков
-    document.getElementById("add-flower-button").onclick = addFlowerInput;
-
-</script>
+<script src="~/js/order.js"></script>

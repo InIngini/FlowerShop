@@ -78,7 +78,7 @@ body {
 }
 
 .menu {
-    margin-left: 25%; /*отступ от лого*/
+    margin-left: 10%; /*отступ от лого*/
 }
 
 .menu-list {
@@ -100,6 +100,15 @@ body {
         .menu-item a:hover /*стили для наведения на меню*/ {
             border-bottom: 2px solid white;
         }
+
+#datetime {
+    border: 1px solid white;
+    border-radius: 5px;
+    padding: 2px 11px;
+    display: flex;
+    font-size: 16px; /* Увеличиваем размер шрифта */
+    margin: 20px; /* Добавляем отступ */
+}
 
 .currency {
     border: 1px solid white;
@@ -574,7 +583,139 @@ body {
     font-size:20px;
 }
 
-.footer {
+#money-text {
+    display: flex;
+    margin-left: 75%;
+    margin-top: 0px;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+
+.admin {
+    display: flex;
+    flex-direction: column; /* Вертикальное выравнивание */
+    align-items: center; /* Центрирование по горизонтали */
+    margin: 0 auto; /* Центрирование секции на странице */
+    padding: 20px; /* Отступы вокруг секции */
+    max-width: 800px; /* Максимальная ширина секции */
+    border: 1px solid #ccc; /* Граница для видимости секции */
+    border-radius: 10px; /* Закруглённые углы */
+}
+    .admin h1 {
+        text-align: center;
+        font-family: 'Merriweather', sans-serif;
+        font-size: 64px;
+        font-style: normal;
+        line-height: 80px;
+        letter-spacing: 1.92px;
+        text-transform: uppercase;
+    }
+    .admin h2 {
+        text-align: center;
+        font-family: 'Merriweather', sans-serif;
+        font-size: 48px;
+        font-style: normal;
+        line-height: 80px;
+        letter-spacing: 1.92px;
+    }
+
+    .admin button {
+        border-radius: 8px;
+        background: linear-gradient(96deg, #DC3251 0%, #750f8a 100%);
+        width: 100px;
+        height: 40px;
+        padding: 10px;
+        border: 0;
+        cursor: pointer;
+        outline: none;
+        color: white;
+        font-size: 14px;
+    }
+
+        .admin button:hover {
+            background: linear-gradient(96deg, #DC3251 0%, #DC3251 100%);
+        }
+
+    .admin input {
+        padding: 16px 10px;
+        background: #white;
+        border-radius: 8px;
+        color: white;
+        width: 150px;
+        height: 40px;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px solid transparent;
+        color: black;
+    }
+    .admin textarea {
+        width: 100%; /* Занимает всю доступную ширину */
+        padding: 10px; /* Добавляет внутренние отступы */
+        border: 1px solid #ccc; /* Цвет рамки */
+        border-radius: 5px; /* Закругленные углы */
+        font-size: 16px; /* Размер шрифта */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Тень */
+        transition: border-color 0.3s; /* Плавная анимация при изменении цвета рамки */
+    }
+
+        .admin textarea:focus {
+            outline: none; /* Убирает стандартный обвод при фокусе */
+            border-color: #007bff; /* Цвет рамки при фокусе */
+        }
+
+    .admin div {
+        width: 600px;
+        height: 100%;
+        padding: 20px;
+        background: linear-gradient(95.61deg, #B7A8D6 0%, #872aca 100%);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+        .admin div button {
+            width: 100px;
+            height: 40px;
+            align-items: center;
+            justify-content: right;
+        }
+
+ul {
+    list-style-type: none; /* Убираем маркеры списка */
+    padding: 0; /* Убираем отступы у списка */
+}
+
+.flower-item,
+.bouquet-item,
+.news-item {
+    display: flex; /* Используем flexbox для выравнивания */
+    justify-content: space-between; /* Равномерное распределение пространства между элементами */
+    align-items: center; /* Вертикальное выравнивание по центру */
+    border: 1px solid #ccc; /* Добавляем границу для видимости */
+    padding: 10px; /* Внутренние отступы */
+    margin: 5px 0; /* Отступы между элементами списка */
+}
+
+.flower-name,
+.bouquet-name,
+.news-content {
+    width: 150px; /* Ширина для названий */
+}
+
+.flower-price,
+.bouquet-price {
+    width: 100px; /* Ширина для цены */
+}
+
+.edit-button,
+.delete-button {
+    width: 100px; /* Ширина для кнопок */
+    margin-left: 10px; /* Отступ между кнопками */
+}
+
+    .footer {
     padding: 60px 0;
 }
 

@@ -93,4 +93,27 @@ if (newsItems) {
 }
 
 
+function updateDateTime() {
+    const now = new Date();
 
+    const days = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+    const dayOfWeek = days[now.getDay()]; // Получаем день недели
+    const day = now.getDate(); // Получаем день месяца
+    const month = now.getMonth() + 1; // Получаем месяц (0-11, поэтому +1)
+    const year = now.getFullYear(); // Получаем год
+    const hours = String(now.getHours()).padStart(2, '0'); // Получаем часы и добавляем ноль в начале, если необходимо
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // Получаем минуты
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // Получаем секунды
+
+    // Форматируем строку
+    const dateTimeString = `${day}.${month}.${year}, ${dayOfWeek}<br>&nbsp;&nbsp;&nbsp;${hours}:${minutes}:${seconds}`;
+
+    // Обновляем содержимое div
+    document.getElementById("datetime").innerHTML = dateTimeString;
+}
+
+// Обновляем время каждые 1000 миллисекунд (1 секунда)
+setInterval(updateDateTime, 1000);
+
+// Первоначальный вызов функции для немедленного отображения
+updateDateTime();

@@ -1,0 +1,232 @@
+﻿@{
+    Layout = "_Layout";
+}
+<section class="admin" id="admin">
+    <h1>Admin Panel</h1>
+
+    <h2>Цветы</h2>
+    <div id="flowerList"></div>
+    <form id="flowerForm">
+        <input type="hidden" id="flowerId" value="">
+        Название: <input type="text" id="flowerName" required oninput="validateRussianLetters(this)">
+        Цена: <input type="number" id="flowerPrice" required min="0" step="0.01" oninput="validatePrice(this)">
+        <button type="submit">Добавить</button>
+    </form>
+
+    <h2>Букеты</h2>
+    <div id="bouquetList"></div>
+    <form id="bouquetForm">
+        <input type="hidden" id="bouquetId" value="">
+        Название: <input type="text" id="bouquetName" required oninput="validateRussianLetters(this)">
+        Цена: <input type="number" id="bouquetPrice" required min="0" step="0.01" oninput="validatePrice(this)">
+        <button type="submit">Добавить</button>
+    </form>
+
+    <h2>Новости</h2>
+    <div id="newsList"></div>
+    <form id="newsForm">
+        <input type="hidden" id="newsId" value="">
+        Новость: <textarea id="newsTitle" required rows="4" cols="50" style="resize: none;"></textarea>
+        <button type="submit">Добавить</button>
+    </form>
+
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateDateTime() {
+        const now = new Date();
+
+        const days = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+        const dayOfWeek = days[now.getDay()]; // Получаем день недели
+        const day = now.getDate(); // Получаем день месяца
+        const month = now.getMonth() + 1; // Получаем месяц (0-11, поэтому +1)
+        const year = now.getFullYear(); // Получаем год
+        const hours = String(now.getHours()).padStart(2, '0'); // Получаем часы и добавляем ноль в начале, если необходимо
+        const minutes = String(now.getMinutes()).padStart(2, '0'); // Получаем минуты
+        const seconds = String(now.getSeconds()).padStart(2, '0'); // Получаем секунды
+
+        // Форматируем строку
+        const dateTimeString = `${day}.${month}.${year}, ${dayOfWeek}<br>&nbsp;&nbsp;&nbsp;${hours}:${minutes}:${seconds}`;
+
+        // Обновляем содержимое div
+        document.getElementById("datetime").innerHTML = dateTimeString;
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+
+
+    $(document).ready(function () {
+        loadFlowers();
+        loadBouquets();
+        loadNews();
+
+        // Flower CRUD
+        $('#flowerForm').submit(function (event) {
+            event.preventDefault();
+            let id = $('#flowerId').val();
+            let name = $('#flowerName').val();
+            let price = parseFloat($('#flowerPrice').val()); // Получаем цену
+
+            let url = id ? `/admin/flowers/${id}` : '/admin/flowers';
+            let method = id ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id, name: name, price: price }), // Добавляем цену в данные
+                success: function () {
+                    $('#flowerName').val('');
+                    $('#flowerPrice').val(''); // Очищаем поле с ценой
+                    $('#flowerId').val('');
+                    loadFlowers();
+                }
+            });
+        });
+
+
+        // Bouquet CRUD
+        $('#bouquetForm').submit(function (event) {
+            event.preventDefault();
+            let id = $('#bouquetId').val();
+            let name = $('#bouquetName').val();
+            let price = parseFloat($('#bouquetPrice').val()); // Получаем цену
+
+            let url = id ? `/admin/bouquets/${id}` : '/admin/bouquets';
+            let method = id ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id, name: name, price: price }), // Добавляем цену в данные
+                success: function () {
+                    $('#bouquetName').val('');
+                    $('#bouquetPrice').val(''); // Очищаем поле с ценой
+                    $('#bouquetId').val('');
+                    loadBouquets();
+                }
+            });
+        });
+
+
+        // News CRUD
+        $('#newsForm').submit(function (event) {
+            event.preventDefault();
+            let id = $('#newsId').val();
+            let title = $('#newsTitle').val();
+            let url = id ? `/admin/news/${id}` : `/admin/news`;
+            let method = id ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify({ id: id, title: title }),
+                success: function () {
+                    $('#newsTitle').val('');
+                    $('#newsId').val('');
+                    loadNews();
+                }
+            });
+        });
+
+    });
+
+    function loadFlowers() {
+        $.get('/admin/flowers', function (data) {
+            let flowerList = '<ul>';
+            data.forEach(function (flower) {
+                flowerList += `<li class="flower-item" data-id="${flower.id}">
+                    <span class="flower-name">${flower.name}</span>
+                    <span class="flower-price">${flower.price}</span>
+                    <button class="edit-button" onclick="editFlower(${flower.id}, '${flower.name}')">Изменить</button>
+                    <button class="delete-button" onclick="deleteFlower(${flower.id})">Удалить</button>
+                </li>`;
+            });
+            flowerList += '</ul>';
+            $('#flowerList').html(flowerList);
+        });
+    }
+
+    function loadBouquets() {
+        $.get('/admin/bouquets', function (data) {
+            let bouquetList = '<ul>';
+            data.forEach(function (bouquet) {
+                bouquetList += `<li class="bouquet-item" data-id="${bouquet.id}">
+                    <span class="bouquet-name">${bouquet.name}</span>
+                    <span class="bouquet-price">${bouquet.price}</span>
+                    <button class="edit-button" onclick="editBouquet(${bouquet.id}, '${bouquet.name}')">Изменить</button>
+                    <button class="delete-button" onclick="deleteBouquet(${bouquet.id})">Удалить</button>
+                </li>`;
+            });
+            bouquetList += '</ul>';
+            $('#bouquetList').html(bouquetList);
+        });
+    }
+
+    function loadNews() {
+        $.get('/admin/news', function (data) {
+            let newsList = '<ul>';
+            data.forEach(function (news) {
+                newsList += `<li class="news-item" data-id="${news.id}">
+                    <span class="news-content">${news.content}</span>
+                    <button class="edit-button" onclick="editNews(${news.id}, '${news.content}')">Изменить</button>
+                    <button class="delete-button" onclick="deleteNews(${news.id})">Удалить</button>
+                </li>`;
+            });
+            newsList += '</ul>';
+            $('#newsList').html(newsList);
+        });
+    }
+
+    function editFlower(id, name) {
+        $('#flowerId').val(id);
+        $('#flowerName').val(name);
+    }
+
+    function deleteFlower(id) {
+        $.ajax({
+            url: `/admin/flowers/${id}`,
+            method: 'DELETE',
+            success: loadFlowers
+        });
+    }
+
+    function editBouquet(id, name) {
+        $('#bouquetId').val(id);
+        $('#bouquetName').val(name);
+    }
+
+    function deleteBouquet(id) {
+        $.ajax({
+            url: `/admin/bouquets/${id}`,
+            method: 'DELETE',
+            success: loadBouquets
+        });
+    }
+
+    function editNews(id, title) {
+        $('#newsId').val(id);
+        $('#newsTitle').val(title);
+    }
+
+    function deleteNews(id) {
+        $.ajax({
+            url: `/admin/news/${id}`,
+            method: 'DELETE',
+            success: loadNews
+        });
+    }
+
+    function validateRussianLetters(input) {
+        // Заменяем все символы, кроме русских букв, пропусков и минимально необходимых символов
+        input.value = input.value.replace(/[^а-яА-ЯёЁ\s]/g, '');
+    }
+
+    function validatePrice(input) {
+        // Заменяем все символы, кроме цифр и точки
+        input.value = input.value.replace(/[^0-9]/g, '');
+    }
+</script>

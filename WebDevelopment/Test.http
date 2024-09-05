@@ -1,0 +1,6 @@
+﻿@WebAPI_HostAddress = http://localhost:7136
+
+# для юзера
+# создание юзера
+GET {{WebAPI_HostAddress}}/admin/flowers
+
