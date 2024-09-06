@@ -1,13 +1,44 @@
-﻿//document.getElementsByClassName("main-title")[0].style.color = "red";
-//обращение к текущему документу, получение всех элементов по определенному классу, первый элемент
+﻿let newsItems = document.getElementById("news-item");
+let newsImage = document.getElementById("news-image");
+let news = [];
+let linqNews = [];
+function fetchNews() {
+    $.get('/news', function (data) {
+        data.forEach(function (d) {
+            news.push(d.content);
+            linqNews.push(d.linq);
+        });
+        showNews(currentIndex);
+    }).fail(function () {
+        console.error('Ошибка при получении новостей');
+    });
+}
 
-//изменение курса валют
+fetchNews();
+
+let currentIndex = 0;
+
+function showNews(index) {
+    newsItems.textContent = news[index];
+    newsImage.src = linqNews[index]; 
+    currentIndex = index;
+}
+document.getElementById("navigation-next").addEventListener("click", function () {
+    const nextIndex = (currentIndex + 1) % news.length;
+    showNews(nextIndex);
+});
+document.getElementById("navigation-prev").addEventListener("click", function () {
+    const prevIndex = (currentIndex - 1 + news.length) % news.length;
+    showNews(prevIndex);
+});
+
+
 //ищем все блоки с ценами
 let prices = document.getElementsByClassName("products-item-price");
 document.getElementById("change-money").onclick = function (e) {
     //запоминаем, что вообще за валюта сейчас
     let currentCurrency = e.target.innerText;
-    let newCurrency = "$";  
+    let newCurrency = "$";
     //коэфф-т для перевода
     let coefficient = 1;
 
@@ -29,47 +60,15 @@ document.getElementById("change-money").onclick = function (e) {
     }
 
     e.target.innerText = newCurrency;
-    
+
     //ищем все элементы
     //меняем валюту
     for (let i = 0; i < prices.length; i++) {
         //"+" - для того, чтобы преобразовать в число
         prices[i].innerText = +(prices[i].getAttribute("data-base-price") * coefficient).toFixed(1) + " " + newCurrency;
     }
-    
+
 }
-
-let newsItems = document.getElementById("news-item");
-let news = [];
-function fetchNews() {
-    $.get('/news', function (data) {
-        news = data; // Заполняем массив новостей полученными данными
-    }).fail(function () {
-        console.error('Ошибка при получении новостей');
-    });
-}
-fetchNews()
-if (newsItems) {
-    let currentIndex = 0;
-
-    function showNews(index) {
-        newsItems.textContent = news[index];
-        currentIndex = index;
-    }
-
-    document.getElementById("navigation-next").addEventListener("click", function () {
-        const nextIndex = (currentIndex + 1) % news.length;
-        showNews(nextIndex);
-    });
-
-    document.getElementById("navigation-prev").addEventListener("click", function () {
-        const prevIndex = (currentIndex - 1 + news.length) % news.length;
-        showNews(prevIndex);
-    });
-
-    showNews(currentIndex);
-}
-
 
 function updateDateTime() {
     const now = new Date();

@@ -6,6 +6,7 @@ namespace WebDevelopment.DB.Entities
     {
         [Key]
         public int Id { get; set; }
+        public string Linq { get; set; }
         public string Content { get; set; }
     }
 }

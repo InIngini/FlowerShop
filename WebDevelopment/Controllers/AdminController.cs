@@ -10,24 +10,49 @@ namespace WebDevelopment.Controllers
     [Route("/admin")]
     public class AdminController : Controller
     {
+        private readonly IAdminService _adminService;
         private readonly IFlowerService _flowerService;
         private readonly IBouquetService _bouquetService;
         private readonly INewService _newService;
         private readonly IOrderService _orderService;
 
-        public AdminController(IFlowerService flowerService, IBouquetService bouquetService, INewService newService, IOrderService orderService)
+        public AdminController(IAdminService adminService, IFlowerService flowerService, IBouquetService bouquetService, INewService newService, IOrderService orderService)
         {
+            _adminService = adminService;
             _flowerService = flowerService;
             _bouquetService = bouquetService;
             _newService = newService;
             _orderService = orderService;
         }
-
         // Метод для отображения административной страницы
         [HttpGet]  // Убедитесь, что этот маршрут правильный
         public IActionResult Index()
         {
             return View();
+        }
+        // Получение информации об администраторе
+        [HttpGet("{id}")]
+        public ActionResult<Admin> GetAdmin(int id)
+        {
+            var admin = _adminService.GetAdminById(id);
+            if (admin == null)
+            {
+                return NotFound();
+            }
+            return Ok(admin);
+        }
+
+        // Изменение данных администратора
+        [HttpPut("{id}")]
+        public ActionResult UpdateAdmin(int id, [FromBody] Admin admin)
+        {
+            if (id != admin.Id)
+            {
+                return BadRequest();
+            }
+
+            _adminService.UpdateAdmin(admin);
+            return NoContent();
         }
         // Добавление заказа
         [HttpPost("orders")]

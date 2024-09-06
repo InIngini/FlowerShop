@@ -310,30 +310,42 @@ body {
 .new {
     margin-bottom: 20px;
     text-align: center;
-    margin-left:-5%;
+    margin-left:-6%;
 }
 
 .news-container {
-    height: 300px; /* Высота блока новостей */
-    margin: 20px 30%; /* Отступы сверху и снизу */
+    height: 500px; /* Высота блока новостей */
+    width: 500px;
+    margin: 31%; /* Отступы сверху и снизу */
     border: 1px solid #ccc; /* Рамка вокруг блока новостей */
     display: flex;
     align-items: center; /* Центрируем текст по вертикали */
     justify-content: center; /* Центрируем текст по горизонтали */
     font-size: 18px; /* Размер текста новостей */
     border-radius: 16px;
-    background: #211A16;
-    border: 1px solid #353535;
-    margin-top:40px;
+    background: linear-gradient(95.61deg, #B7A8D6 0%, #872aca 100%);  
+    margin-top: 40px;
+}
+
+#news-image { 
+    margin-top:-100px;
+    max-width: 300px; /* Изображение не больше ширины контейнера */
+    max-height: 300px; /* Ограничиваем максимальную высоту изображения */
+    object-fit: contain; /* Сохраняем пропорции изображения */
+    border-radius: 12px;
 }
 
 #news-item {
+    margin-top: 420px;
     position: absolute;
-    width: 100%; /* Занимает 100% ширины блока */
+    width: 500px;
+    height:200px;
     font-size: 16px;
 }
 
 .navigation {
+    margin-left:-40px;
+    margin-top:-400px;
     display: flex;
     justify-content: center; /* Центрируем стрелки */
 }
@@ -661,6 +673,7 @@ body {
         color: black;
     }
     .admin textarea {
+        margin-top: 5px;
         width: 100%; /* Занимает всю доступную ширину */
         padding: 10px; /* Добавляет внутренние отступы */
         border: 1px solid #ccc; /* Цвет рамки */
@@ -713,7 +726,7 @@ ul {
 .flower-name,
 .bouquet-name,
 .news-content {
-    width: 150px; /* Ширина для названий */
+    width: 450px; /* Ширина для названий */
 }
 
 .flower-price,
@@ -721,6 +734,15 @@ ul {
     width: 100px; /* Ширина для цены */
 }
 
+.news-img {
+    width: 300px; /* Ширина для адреса */
+}
+
+#newsImage{
+    margin-top:5px;
+    margin-bottom:5px;
+    width: 100%;
+}
 .order-item {
     display: flex; /* Или display: grid; */
     flex-direction: row; /* Располагаем элементы по колонкам */

@@ -54,9 +54,9 @@ namespace WebDevelopment
             {
                 context.News.AddRange(new List<New>
                 {
-                    new New { Content = "Новинка сезона: летние цветы!" },
-                    new New { Content = "Скидки на букеты в этом месяце!" },
-                    new New { Content = "Специальное предложение: 20% на все цветы!" }
+                    new New { Linq="https://i.pinimg.com/736x/65/57/f3/6557f31f1326dd9eebbaf08841d2f13b.jpg",Content = "Новинка сезона: летние цветы!" },
+                    new New { Linq="https://megacvet24.ru/image/catalog/Blog/kak-vybrat-buket-na-14-fevralja_3.jpg",Content = "Скидки на букеты в этом месяце!" },
+                    new New { Linq="https://avatars.mds.yandex.net/get-altay/927353/2a00000187a13ec791f0ff8b7ae52b925dba/XXL_height",Content = "Специальное предложение: 20% на все цветы!" }
                 });
             }
 

@@ -13,6 +13,7 @@ namespace WebDevelopment.Controllers
         {
             _newService = newService;
         }
+        [HttpGet]
         public IActionResult Index()
         {
             return View();

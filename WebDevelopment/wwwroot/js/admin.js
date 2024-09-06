@@ -21,10 +21,35 @@ updateDateTime();
 
 
 $(document).ready(function () {
+    const adminId = 1;
     loadFlowers();
     loadBouquets();
     loadNews();
     loadOrders();
+    loadAdmin(adminId);
+
+    $('#loginForm').submit(function (event) {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы
+        let username = $('#username').val().trim();
+        let password = $('#password').val().trim();
+
+        // Проверка на пустые поля
+        if (!username || !password) {
+            alert("Пожалуйста, введите логин и пароль.");
+            return;
+        }
+
+        // Здесь должен быть ваш AJAX-запрос для аутентификации
+        $.post('/admin/login', { username: username, password: password }, function (response) {
+            // Предполагаем, что на сервере проверяется логин и пароль
+            if (response.success) {
+                alert("Успешный вход!"); // Уведомление об успешном входе
+                loadFlowers(); // Загружаем цветы после входа
+            } else {
+                alert("Ошибка аутентификации: " + response.message);
+            }
+        });
+    });
 
     // Flower CRUD
     $('#flowerForm').submit(function (event) {
@@ -95,16 +120,22 @@ $(document).ready(function () {
         });
     });
 
-
     // News CRUD
     $('#newsForm').submit(function (event) {
         event.preventDefault(); // Предотвращаем перезагрузку страницы
         let id = $('#newsId').val(); // Получаем ID новости, если он есть
         let content = $('#newsContent').val().trim(); // Получаем содержание и удаляем пробелы
+        let imageUrl = $('#newsImage').val().trim(); // Получаем ссылку на изображение
 
         // Проверяем, установлено ли содержание
         if (!content) {
             alert("Пожалуйста, введите содержание новости."); // Предупреждаем о неверных данных
+            return;
+        }
+
+        // Проверяем, установлена ли ссылка на изображение
+        if (!imageUrl) {
+            alert("Пожалуйста, введите ссылку на изображение."); // Предупреждаем о неверных данных
             return;
         }
 
@@ -115,15 +146,48 @@ $(document).ready(function () {
             url: url, // Устанавливаем URL
             method: method, // Устанавливаем метод
             contentType: 'application/json', // Указываем тип содержимого
-            data: JSON.stringify({ content: content }), // Передаем данные
+            data: JSON.stringify({ content: content, linq: imageUrl }), // Передаем данные
             success: function () {
                 $('#newsContent').val(''); // Очищаем поле с содержанием
+                $('#newsImage').val(''); // Очищаем поле с изображением
                 $('#newsId').val(''); // Очищаем ID
                 loadNews(); // Обновляем список новостей
             },
             error: function (xhr, status, error) {
                 console.error("Ошибка при добавлении или обновлении новости:", error); // Логируем ошибку
                 alert("Произошла ошибка при добавлении или обновлении новости: " + xhr.responseText); // Уведомляем пользователя об ошибке
+            }
+        });
+    });
+
+    $('#adminForm').submit(function (event) {
+        event.preventDefault(); // Предотвращаем перезагрузку страницы
+
+        let id = $('#adminId').val(); // Получаем ID администратора
+        let login = $('#adminLogin').val().trim(); // Получаем логин
+        let password = $('#adminPassword').val(); // Получаем пароль
+
+        // Проверка на корректность введенных данных
+        if (!login || !password) {
+            alert("Пожалуйста, введите логин и пароль.");
+            return;
+        }
+
+        // Данные для сохранения
+        let data = { id: id, login: login, password: password };
+
+        // Отправка данных на сервер для обновления
+        $.ajax({
+            url: `/admin/${id}`,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function () {
+                alert("Данные администратора успешно обновлены.");
+                loadAdmin(adminId); // Перезагружаем информацию об администраторе
+            },
+            error: function (xhr) {
+                alert("Ошибка при обновлении данных администратора: " + xhr.responseText);
             }
         });
     });
@@ -166,9 +230,11 @@ function loadNews() {
     $.get('/admin/news', function (data) {
         let newsList = '<ul>';
         data.forEach(function (news) {
+            let shortLink = news.linq ? news.linq.substring(0, 20) : '';
             newsList += `<li class="news-item" data-id="${news.id}">
                     <span class="news-content">${news.content}</span>
-                    <button class="edit-button" onclick="editNews(${news.id}, '${news.content}')">Изменить</button>
+                    <span class="news-img">Ссылка: <a href="${news.linq}" target="_blank">${shortLink}...</a></span>
+                    <button class="edit-button" onclick="editNews(${news.id}, '${news.content}', '${news.linq}')">Изменить</button>
                     <button class="delete-button" onclick="deleteNews(${news.id})">Удалить</button>
                 </li>`;
         });
@@ -177,7 +243,6 @@ function loadNews() {
     });
 }
 
-// Загрузка заказов
 function loadOrders() {
     $.get('/admin/orders', function (data) {
         let ordersList = '<ul>';
@@ -194,6 +259,16 @@ function loadOrders() {
         });
         ordersList += '</ul>';
         $('#ordersList').html(ordersList);
+    });
+}
+
+function loadAdmin(id) {
+    $.get(`/admin/${id}`, function (data) {
+        $('#adminId').val(data.id);
+        $('#adminLogin').val(data.login);
+        $('#adminPassword').val(data.password);
+    }).fail(function () {
+        alert("Ошибка при загрузке данных администратора.");
     });
 }
 
@@ -225,9 +300,10 @@ function deleteBouquet(id) {
     });
 }
 
-function editNews(id, content) {
+function editNews(id, content, linq) {
     $('#newsId').val(id);
     $('#newsContent').val(content);
+    $('#newsImage').val(linq); // Заполняем поле с изображением
 }
 
 function deleteNews(id) {
