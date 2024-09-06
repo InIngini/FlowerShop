@@ -4,6 +4,8 @@ using WebDevelopment.DB.Entities;
 
 namespace WebDevelopment.Controllers
 {
+    [ApiController]
+    [Route("/")]
     public class HomeController : Controller
     {
         private readonly INewService _newService;
@@ -16,7 +18,7 @@ namespace WebDevelopment.Controllers
             return View();
         }
 
-        [HttpGet("New")]
+        [HttpGet("news")]
         public ActionResult<IEnumerable<New>> GetAllNews()
         {
             var news = _newService.GetAllNews();

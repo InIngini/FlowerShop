@@ -29,7 +29,7 @@ namespace WebDevelopment
             services.AddScoped<IBouquetService, BouquetService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<INewService, NewService>();
-
+            services.AddScoped<IOrderService, OrderService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

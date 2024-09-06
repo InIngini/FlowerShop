@@ -13,12 +13,14 @@ namespace WebDevelopment.Controllers
         private readonly IFlowerService _flowerService;
         private readonly IBouquetService _bouquetService;
         private readonly INewService _newService;
+        private readonly IOrderService _orderService;
 
-        public AdminController(IFlowerService flowerService, IBouquetService bouquetService, INewService newService)
+        public AdminController(IFlowerService flowerService, IBouquetService bouquetService, INewService newService, IOrderService orderService)
         {
             _flowerService = flowerService;
             _bouquetService = bouquetService;
             _newService = newService;
+            _orderService = orderService;
         }
 
         // Метод для отображения административной страницы
@@ -26,6 +28,51 @@ namespace WebDevelopment.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+        // Добавление заказа
+        [HttpPost("orders")]
+        public async Task<IActionResult> AddOrder([FromBody] Order order)
+        {
+            await _orderService.AddOrder(order);
+            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
+        }
+
+        // Обновление заказа
+        [HttpPut("orders/{id}")]
+        public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
+        {
+            if (id != order.Id)
+            {
+                return BadRequest();
+            }
+            await _orderService.UpdateOrder(order);
+            return NoContent();
+        }
+
+        // Удаление заказа
+        [HttpDelete("orders/{id}")]
+        public async Task<IActionResult> DeleteOrder(int id)
+        {
+            await _orderService.DeleteOrder(id);
+            return NoContent();
+        }
+
+        // Получение заказа по ID
+        [HttpGet("orders/{id}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            var order = await _orderService.GetOrderById(id);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            return Ok(order);
+        }
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetOrders()
+        {
+            var orders = await _orderService.GetOrders();
+            return Ok(orders); // Убедитесь, что orders - это список объектов Order
         }
 
         // CRUD для цветов
@@ -132,6 +179,7 @@ namespace WebDevelopment.Controllers
         [HttpPut("news/{id}")]
         public ActionResult UpdateNew(int id, [FromBody] New news)
         {
+            news.Id = id;
             if (id != news.Id) return BadRequest();
             _newService.UpdateNew(news);
             return NoContent();

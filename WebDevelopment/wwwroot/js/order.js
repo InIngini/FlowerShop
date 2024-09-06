@@ -93,8 +93,33 @@ function showInputs() {
     }
 }
 
-const presetBouquets = ["Букет 1", "Букет 2", "Букет 3"];
-let pricesBouquets = [1.3, 2.7, 3.5];
+let presetBouquets = [];
+let pricesBouquets = [];
+let flowers = [];
+let pricesFlowers = [];
+
+// Функция для загрузки букетов и цветов
+function loadBouquetsAndFlowers() {
+    // Получаем готовые букеты
+    $.get('/order/bouquets', function (data) {
+        // Заполнение массивов букетов и цен
+        data.forEach(function (bouquet) {
+            presetBouquets.push(bouquet.name);
+            pricesBouquets.push(bouquet.price);
+        });
+    });
+
+    // Получаем цветы
+    $.get('/order/flowers', function (flowerData) {
+        // Заполнение массивов цветов и цен
+        flowerData.forEach(function (flower) {
+            flowers.push(flower.name);
+            pricesFlowers.push(flower.price);
+        });
+    });
+}
+// Вызываем функцию загрузки данных при загрузке страницы
+loadBouquetsAndFlowers();
 
 function addBouquet() {
     const presetSelect = document.getElementById("preset-bouquet");
@@ -126,8 +151,6 @@ function changeMoneyText(money) {
 }
 
 let divsFlowers = [];
-const flowers = ["Роза", "Астра", "Тюльпан"];
-let pricesFlowers = [0.2, 0.4, 0.5];
 // Функция для добавления нового селекта с цветами и полем количества
 function addFlowerInput() {
 
@@ -274,3 +297,72 @@ setInterval(updateDateTime, 1000);
 
 // Первоначальный вызов функции для немедленного отображения
 updateDateTime();
+
+
+$('#order-action').click(function (event) {
+    event.preventDefault(); // Предотвращаем перезагрузку страницы
+
+    let orderDetails = {
+        bouquetType: $('#bouquet-type').val(),
+        presetBouquet: $('#preset-bouquet').val(),
+        name: $('#name').val().trim(),
+        lastName: $('#last-name').val().trim(),
+        phoneNumber: $('#phone').val().trim(),
+        address: $('#address').val().trim(),
+        paymentType: $('#payment-type option:selected').text(),
+        orderText: getCustomBouquetDetails(), // Функция для получения деталей кастомного букета
+        price: $('#money-text').text()
+    };
+
+    // Проверка обязательных полей
+    if (!orderDetails.name || !orderDetails.phoneNumber || !orderDetails.address) {
+        alert("Пожалуйста, заполните все обязательные поля."); // Предупреждение о неверных данных
+        return;
+    }
+
+    // Отправка заказа
+    $.ajax({
+        url: '/order/Orders', // Убедитесь, что путь API написан правильно
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(orderDetails),
+        success: function (result) {
+            alert('Заказ успешно оформлен!'); // Сообщение пользователю о успешном заказе
+            // Очистить форму или выполнить другие действия
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.error("Ошибка при оформлении заказа:", error); // Логируем ошибку
+            alert("Произошла ошибка при оформлении заказа: " + xhr.responseText); // Уведомляем пользователя об ошибке
+        }
+    });
+});
+function getCustomBouquetDetails() {
+    let details = [];
+    const bouquetType = document.getElementById("bouquet-type").value;
+    
+    if (bouquetType === "готовый") {
+        const presetBouquet = document.getElementById("preset-bouquet").value;
+        details.push(`Готовый букет: ${presetBouquet}`);
+    } else if (bouquetType === "составить") {
+        divsFlowers.forEach(div => {
+            const flowerSelect = div.querySelector("select"); // Получаем селект внутри текущего div
+            const quantityInput = div.querySelector("input[type='number']"); // Получаем инпут количества
+
+            const selectedFlower = flowerSelect.value; // Получаем выбранный цветок
+            const quantity = parseInt(quantityInput.value) || 0; // Получаем количество или 0, если не введено
+
+            if (details.length === 0) {
+                selectedFlower = `$Собрать букет: {selectedFlower}`;
+            }
+            if (quantity > 0) { // Проверяем, что количество больше нуля
+                details.push(`${selectedFlower}: ${quantity}`); // Формируем строку типа "Роза: 2"
+            }
+        });
+    } else if (bouquetType === "неважно") {
+        const amountValue = document.getElementById("amount").value; // Получаем значение из поля количества
+        details.push(`Неважно: ${amountValue}`);
+    }
+
+    return details.join(", "); // Объединяем все детали в одну строку, разделяя запятыми
+}

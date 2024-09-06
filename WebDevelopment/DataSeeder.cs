@@ -60,6 +60,17 @@ namespace WebDevelopment
                 });
             }
 
+            // Проверка и добавление заказов
+            if (!context.Orders.Any())
+            {
+                context.Orders.AddRange(new List<Order>
+                {
+                    new Order { Name = "Алексей", LastName = "Иванов", PhoneNumber = "+7 (900) 999-99-99", Address = "Москва, ул. Пушкина, д. 1", PaymentType = "Картой сейчас", OrderText = "Готовый букет: Смешанный букет", Price="600 ₽" },
+                    new Order { Name = "Мария", LastName = "Петрова", PhoneNumber = "+7 (900) 999-99-88", Address = "Санкт-Петербург, ул. Ленина, д. 2", PaymentType = "Наличные курьеру", OrderText = "Собрать букет: Роза-4, Лилия-3", Price="700 ₽" },
+                    new Order { Name = "Дмитрий", LastName = "Сидоров", PhoneNumber = "+7 (900) 999-99-77", Address = "Екатеринбург, ул. Гоголя, д. 3", PaymentType = "Картой курьеру", OrderText = "Не важно: 500 ₽", Price="500 ₽" }
+                });
+            }
+
             // Сохраняем изменения в базе данных
             context.SaveChanges();
         }

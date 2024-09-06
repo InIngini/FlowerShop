@@ -34,5 +34,6 @@ namespace WebDevelopment.DB
         public DbSet<Flower> Flowers { get; set; }
         public DbSet<New> News { get; set; }
         public DbSet<Admin> Admins { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }
