@@ -14,5 +14,6 @@ namespace WebDevelopment.BLL.Interfaces
         void AddAdmin(Admin admin);
         void UpdateAdmin(Admin admin);
         void DeleteAdmin(int id);
+        string Login(string Login, string Password);
     }
 }

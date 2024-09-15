@@ -19,8 +19,34 @@
 setInterval(updateDateTime, 1000);
 updateDateTime();
 
+let tokenExpired = false; // Флаг для отслеживания, истек ли токен
+function updateTokenExpiryDisplay() {
+    const tokenExpiry = localStorage.getItem('tokenExpiry');
+    if (tokenExpiry) {
+        const currentTime = Math.floor(Date.now() / 1000);
+        const remainingTime = tokenExpiry - currentTime;
+
+        // Обновляем интерфейс, отображая оставшееся время
+        if (remainingTime > 0 || tokenExpired) {
+            const remainingMinutes = Math.floor(remainingTime / 60); // Округляем до меньшего целого
+            const remainingSeconds = remainingTime % 60;
+            $('#tokenExpiryDisplay').text(`Осталось ${remainingMinutes}:${remainingSeconds} до истечения сессии.`);
+            tokenExpired = false; // Сбрасываем флаг, если токен еще действителен
+        } else {
+            $('#tokenExpiryDisplay').text("Токен истек.");
+            alert("Токен истек, перезайдите.");
+            tokenExpired = true; // Устанавливаем флаг, что токен истек
+            window.location.href = '/'; // Переход на главную страницу
+        }
+    }
+}
+updateTokenExpiryDisplay();
+// Вызовите эту функцию через интервал для периодического обновления
+setInterval(updateTokenExpiryDisplay, 1000); // Обновляем каждую минуту
+
 
 $(document).ready(function () {
+    const token = localStorage.getItem('adminToken'); // Получаем токен из локального хранилища
     const adminId = 1;
     loadFlowers();
     loadBouquets();
@@ -40,7 +66,7 @@ $(document).ready(function () {
         }
 
         // Здесь должен быть ваш AJAX-запрос для аутентификации
-        $.post('/admin/login', { username: username, password: password }, function (response) {
+        $.post('/admin/login', { id:1, username: username, password: password }, function (response) {
             // Предполагаем, что на сервере проверяется логин и пароль
             if (response.success) {
                 alert("Успешный вход!"); // Уведомление об успешном входе
@@ -72,7 +98,7 @@ $(document).ready(function () {
             url: url, // Устанавливаем URL
             method: method, // Устанавливаем метод
             contentType: 'application/json',
-            data: JSON.stringify({ name: name, price: price }), // Передаем данные
+            data: JSON.stringify({ id: id, name: name, price: price }), // Передаем данные
             success: function () {
                 $('#flowerName').val(''); // Очищаем поле с названием
                 $('#flowerPrice').val(''); // Очищаем поле с ценой
@@ -106,7 +132,7 @@ $(document).ready(function () {
             url: url, // Устанавливаем URL
             method: method, // Устанавливаем метод
             contentType: 'application/json',
-            data: JSON.stringify({ name: name, price: price }), // Передаем данные
+            data: JSON.stringify({ id: id, name: name, price: price }), // Передаем данные
             success: function () {
                 $('#bouquetName').val(''); // Очищаем поле с названием
                 $('#bouquetPrice').val(''); // Очищаем поле с ценой
@@ -146,7 +172,7 @@ $(document).ready(function () {
             url: url, // Устанавливаем URL
             method: method, // Устанавливаем метод
             contentType: 'application/json', // Указываем тип содержимого
-            data: JSON.stringify({ content: content, linq: imageUrl }), // Передаем данные
+            data: JSON.stringify({ id: id, content: content, linq: imageUrl }), // Передаем данные
             success: function () {
                 $('#newsContent').val(''); // Очищаем поле с содержанием
                 $('#newsImage').val(''); // Очищаем поле с изображением
@@ -248,6 +274,7 @@ function loadOrders() {
         let ordersList = '<ul>';
         data.forEach(function (order) {
             ordersList += `<li class="order-item" data-id="${order.id}">
+                    <span class="order-email">${order.email}</span>
                     <span class="order-name">${order.name} ${order.lastName}</span>
                     <span class="order-phone">${order.phoneNumber}</span>
                     <span class="order-address">${order.address}</span>

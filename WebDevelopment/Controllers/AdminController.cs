@@ -3,9 +3,12 @@ using WebDevelopment.BLL.Interfaces;
 using WebDevelopment.DB.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using WebDevelopment.BLL.Token;
 
 namespace WebDevelopment.Controllers
 {
+    //[Authorize]
     [ApiController]
     [Route("/admin")]
     public class AdminController : Controller
@@ -15,20 +18,29 @@ namespace WebDevelopment.Controllers
         private readonly IBouquetService _bouquetService;
         private readonly INewService _newService;
         private readonly IOrderService _orderService;
+        private readonly ITokenValidator _tokenValidator;
 
-        public AdminController(IAdminService adminService, IFlowerService flowerService, IBouquetService bouquetService, INewService newService, IOrderService orderService)
+        public AdminController(IAdminService adminService, IFlowerService flowerService, IBouquetService bouquetService, INewService newService, IOrderService orderService, ITokenValidator tokenValidator)
         {
             _adminService = adminService;
             _flowerService = flowerService;
             _bouquetService = bouquetService;
             _newService = newService;
             _orderService = orderService;
+            _tokenValidator = tokenValidator;
         }
         // Метод для отображения административной страницы
         [HttpGet]  // Убедитесь, что этот маршрут правильный
-        public IActionResult Index()
+        [AllowAnonymous]
+        public IActionResult Index(string token)
         {
-            return View();
+            // Валидация токена
+            int userId = _tokenValidator.ValidateToken(token);
+
+            if (userId > 0)
+                return View();
+            else
+                return RedirectToAction("Index", "Home");
         }
         // Получение информации об администраторе
         [HttpGet("{id}")]
@@ -44,6 +56,7 @@ namespace WebDevelopment.Controllers
 
         // Изменение данных администратора
         [HttpPut("{id}")]
+        
         public ActionResult UpdateAdmin(int id, [FromBody] Admin admin)
         {
             if (id != admin.Id)
@@ -54,8 +67,10 @@ namespace WebDevelopment.Controllers
             _adminService.UpdateAdmin(admin);
             return NoContent();
         }
+
         // Добавление заказа
         [HttpPost("orders")]
+        
         public async Task<IActionResult> AddOrder([FromBody] Order order)
         {
             await _orderService.AddOrder(order);
@@ -64,6 +79,7 @@ namespace WebDevelopment.Controllers
 
         // Обновление заказа
         [HttpPut("orders/{id}")]
+        
         public async Task<IActionResult> UpdateOrder(int id, [FromBody] Order order)
         {
             if (id != order.Id)
@@ -76,6 +92,7 @@ namespace WebDevelopment.Controllers
 
         // Удаление заказа
         [HttpDelete("orders/{id}")]
+        
         public async Task<IActionResult> DeleteOrder(int id)
         {
             await _orderService.DeleteOrder(id);
@@ -102,6 +119,7 @@ namespace WebDevelopment.Controllers
 
         // CRUD для цветов
         [HttpPost("flowers")]
+        
         public async Task<ActionResult> AddFlower([FromBody] Flower flower)
         {
             _flowerService.AddFlower(flower);
@@ -125,6 +143,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpPut("flowers/{id}")]
+        
         public ActionResult UpdateFlower(int id, [FromBody] Flower flower)
         {
             if (id != flower.Id) return BadRequest();
@@ -133,6 +152,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpDelete("flowers/{id}")]
+        
         public ActionResult DeleteFlower(int id)
         {
             _flowerService.DeleteFlower(id);
@@ -141,6 +161,7 @@ namespace WebDevelopment.Controllers
 
         // CRUD для букетов
         [HttpPost("bouquets")]
+        
         public async Task<ActionResult> AddBouquet([FromBody] Bouquet bouquet)
         {
             _bouquetService.AddBouquet(bouquet);
@@ -163,6 +184,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpPut("bouquets/{id}")]
+        
         public ActionResult UpdateBouquet(int id, [FromBody] Bouquet bouquet)
         {
             if (id != bouquet.Id) return BadRequest();
@@ -171,6 +193,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpDelete("bouquets/{id}")]
+        
         public ActionResult DeleteBouquet(int id)
         {
             _bouquetService.DeleteBouquet(id);
@@ -179,6 +202,7 @@ namespace WebDevelopment.Controllers
 
         // CRUD для новостей
         [HttpPost("news")]
+        
         public async Task<ActionResult> AddNew([FromBody] New news)
         {
             _newService.AddNew(news);
@@ -202,6 +226,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpPut("news/{id}")]
+        
         public ActionResult UpdateNew(int id, [FromBody] New news)
         {
             news.Id = id;
@@ -211,6 +236,7 @@ namespace WebDevelopment.Controllers
         }
 
         [HttpDelete("news/{id}")]
+        
         public ActionResult DeleteNew(int id)
         {
             _newService.DeleteNew(id);

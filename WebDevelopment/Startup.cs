@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using WebDevelopment.BLL.Errors;
 using WebDevelopment.BLL.Interfaces;
 using WebDevelopment.BLL.Services;
+using WebDevelopment.BLL.Token;
 using WebDevelopment.DB;
 
 namespace WebDevelopment
@@ -24,6 +26,14 @@ namespace WebDevelopment
             // Настройка контекста базы данных с использованием строки подключения
             services.AddDbContext<Context>(options =>
                 options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+
+            // Регистрация ITokenService и ITokenValidator
+            services.AddTransient<ITokenService, TokenService>();
+            services.AddScoped<ITokenValidator, TokenValidator>();
+
+            // Аутентификация
+            services.AddAuthentication()
+                .AddScheme<AuthenticationSchemeOptions, TokenAuthenticationHandler>("TokenAuthentication", options => { });
 
             services.AddScoped<IFlowerService, FlowerService>();
             services.AddScoped<IBouquetService, BouquetService>();
@@ -52,6 +62,7 @@ namespace WebDevelopment
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

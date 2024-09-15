@@ -305,6 +305,7 @@ $('#order-action').click(function (event) {
     let orderDetails = {
         bouquetType: $('#bouquet-type').val(),
         presetBouquet: $('#preset-bouquet').val(),
+        email: $('#email').val().trim(),
         name: $('#name').val().trim(),
         lastName: $('#last-name').val().trim(),
         phoneNumber: $('#phone').val().trim(),
@@ -313,16 +314,15 @@ $('#order-action').click(function (event) {
         orderText: getCustomBouquetDetails(), // Функция для получения деталей кастомного букета
         price: $('#money-text').text()
     };
-
     // Проверка обязательных полей
-    if (!orderDetails.name || !orderDetails.phoneNumber || !orderDetails.address) {
+    if (!orderDetails.name || !orderDetails.phoneNumber || !orderDetails.address || !orderDetails.email) {
         alert("Пожалуйста, заполните все обязательные поля."); // Предупреждение о неверных данных
         return;
     }
 
     // Отправка заказа
     $.ajax({
-        url: '/order/Orders', // Убедитесь, что путь API написан правильно
+        url: '/order/orders', // Убедитесь, что путь API написан правильно
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(orderDetails),
@@ -337,10 +337,11 @@ $('#order-action').click(function (event) {
         }
     });
 });
+
 function getCustomBouquetDetails() {
     let details = [];
     const bouquetType = document.getElementById("bouquet-type").value;
-    
+
     if (bouquetType === "готовый") {
         const presetBouquet = document.getElementById("preset-bouquet").value;
         details.push(`Готовый букет: ${presetBouquet}`);
@@ -366,3 +367,4 @@ function getCustomBouquetDetails() {
 
     return details.join(", "); // Объединяем все детали в одну строку, разделяя запятыми
 }
+

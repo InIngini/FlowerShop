@@ -2,6 +2,8 @@
 using WebDevelopment.BLL.Interfaces;
 using WebDevelopment.BLL.Services;
 using WebDevelopment.DB.Entities;
+using System.Net;
+using System.Net.Mail;
 
 namespace WebDevelopment.Controllers
 {
@@ -45,6 +47,7 @@ namespace WebDevelopment.Controllers
             await _orderService.AddOrder(order);
             return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
         }
+
         [HttpGet("Order/{id}")]
         public async Task<IActionResult> GetOrderById(int id)
         {
