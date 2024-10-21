@@ -2,8 +2,6 @@
 using WebDevelopment.BLL.Interfaces;
 using WebDevelopment.BLL.Services;
 using WebDevelopment.DB.Entities;
-using System.Net;
-using System.Net.Mail;
 
 namespace WebDevelopment.Controllers
 {

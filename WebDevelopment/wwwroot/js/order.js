@@ -302,17 +302,24 @@ updateDateTime();
 $('#order-action').click(function (event) {
     event.preventDefault(); // Предотвращаем перезагрузку страницы
 
+    const email = document.getElementById('email').value;
+    const lastName = document.getElementById('last-name').value;
+    const name = document.getElementById('name').value;
+    const phoneNumber = document.getElementById('phone').value;
+    const address = document.getElementById('address').value;
+    const paymentType = $('#payment-type option:selected').text();
+    const orderText = getCustomBouquetDetails(); // Предполагается, что это функция, которая собирает текст заказа
+    const price = $('#money-text').text();
+
     let orderDetails = {
-        bouquetType: $('#bouquet-type').val(),
-        presetBouquet: $('#preset-bouquet').val(),
-        email: $('#email').val().trim(),
-        name: $('#name').val().trim(),
-        lastName: $('#last-name').val().trim(),
-        phoneNumber: $('#phone').val().trim(),
-        address: $('#address').val().trim(),
-        paymentType: $('#payment-type option:selected').text(),
-        orderText: getCustomBouquetDetails(), // Функция для получения деталей кастомного букета
-        price: $('#money-text').text()
+        email: email,
+        lastName: lastName,
+        name: name,
+        phoneNumber: phoneNumber,
+        address: address,
+        paymentType: paymentType,
+        orderText: orderText,
+        price: price
     };
     // Проверка обязательных полей
     if (!orderDetails.name || !orderDetails.phoneNumber || !orderDetails.address || !orderDetails.email) {
@@ -333,9 +340,29 @@ $('#order-action').click(function (event) {
         },
         error: function (xhr, status, error) {
             console.error("Ошибка при оформлении заказа:", error); // Логируем ошибку
-            alert("Произошла ошибка при оформлении заказа: " + xhr.responseText); // Уведомляем пользователя об ошибке
+            alert("Произошла ошибка при оформлении заказа: " +error + " " + status + " " + xhr.responseText); // Уведомляем пользователя об ошибке
         }
     });
+    //try {
+    //    const response = await fetch('/order/orders', { // Обратите внимание, здесь используется ваш URL для API
+    //        method: 'POST',
+    //        headers: {
+    //            'Content-Type': 'application/json'
+    //        },
+    //        body: JSON.stringify(order)
+    //    });
+
+    //    if (!response.ok) {
+    //        throw new Error('Ошибка при добавлении заказа: ' + response.statusText);
+    //    }
+
+    //    const result = await response.json();
+    //    console.log('Заказ успешно добавлен:', result);
+    //    // Здесь вы можете добавлять дополнительные действия, например, очищение формы или отображение сообщения пользователю
+    //} catch (error) {
+    //    console.error('Ошибка:', error);
+    //    // Здесь можно также уведомить пользователя об ошибке
+    //}
 });
 
 function getCustomBouquetDetails() {

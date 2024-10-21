@@ -544,6 +544,7 @@ input {
         box-sizing: border-box;
         outline: none;
         border: 1px solid transparent;
+        margin-top: 15px;
     }
 
 .order-form-inputs button {
